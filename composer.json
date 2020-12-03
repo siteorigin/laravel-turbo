@@ -1,0 +1,27 @@
+{
+    "name": "siteorigin/turbo",
+    "description": "A package that gives your frontend Turbolinks with preloading.",
+    "type": "package",
+    "require": {
+        "laravel/framework": "^8.17"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Greg Priday",
+            "email": "greg@siteorigin.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SiteOrigin\\Turbo\\": "src/"
+        }
+    },
+    "extras" : {
+        "laravel" : {
+            "providers": [
+                "SiteOrigin\\Turbo\\TurboServiceProvider"
+            ]
+        }
+    }
+}
