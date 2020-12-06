@@ -1,6 +1,5 @@
 const hoverTime = 100
 const fetchers = {}
-const doc = document.implementation.createHTMLDocument('prefetch')
 
 function fetchPage (url, success) {
   const xhr = new XMLHttpRequest()
@@ -17,6 +16,7 @@ function fetchPage (url, success) {
 
 function prefetchTurbolink (url) {
   fetchPage(url, responseText => {
+    const doc = document.implementation.createHTMLDocument('prefetch')
     doc.open()
     doc.write(responseText)
     doc.close()
@@ -51,4 +51,14 @@ document.addEventListener('mouseover', event => {
   cleanup(event)
   event.target.addEventListener('mouseleave', cleanup)
   fetchers[url] = setTimeout(() => prefetch(url), hoverTime)
+})
+
+// Change the Turbolinks cache size
+document.addEventListener('turbolinks:load', event => { Turbolinks.controller.cache.size = 40 }, { once: true })
+
+document.addEventListener('turbolinks:load', (event) => {
+  document.querySelectorAll('a[rel*="prefetch"]').forEach((el) => {
+    const url = el.getAttribute('href');
+    if (!prefetched(url) && !prefetching(url)) prefetch(url)
+  })
 })

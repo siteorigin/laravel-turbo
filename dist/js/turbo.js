@@ -132,7 +132,6 @@ __webpack_require__(/*! turbolinks */ "./node_modules/turbolinks/dist/turbolinks
 
 var hoverTime = 100;
 var fetchers = {};
-var doc = document.implementation.createHTMLDocument('prefetch');
 
 function fetchPage(url, success) {
   var xhr = new XMLHttpRequest();
@@ -151,6 +150,7 @@ function fetchPage(url, success) {
 
 function prefetchTurbolink(url) {
   fetchPage(url, function (responseText) {
+    var doc = document.implementation.createHTMLDocument('prefetch');
     doc.open();
     doc.write(responseText);
     doc.close();
@@ -187,6 +187,18 @@ document.addEventListener('mouseover', function (event) {
   fetchers[url] = setTimeout(function () {
     return prefetch(url);
   }, hoverTime);
+}); // Change the Turbolinks cache size
+
+document.addEventListener('turbolinks:load', function (event) {
+  Turbolinks.controller.cache.size = 40;
+}, {
+  once: true
+});
+document.addEventListener('turbolinks:load', function (event) {
+  document.querySelectorAll('a[rel*="prefetch"]').forEach(function (el) {
+    var url = el.getAttribute('href');
+    if (!prefetched(url) && !prefetching(url)) prefetch(url);
+  });
 });
 
 /***/ }),
@@ -198,7 +210,7 @@ document.addEventListener('mouseover', function (event) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /Users/gpriday/Dropbox/Sites/postcontent/packages/siteorigin/turbo/resources/js/turbo.js */"./resources/js/turbo.js");
+module.exports = __webpack_require__(/*! /Users/gpriday/Dropbox/Sites/postcontent/packages/turbo/resources/js/turbo.js */"./resources/js/turbo.js");
 
 
 /***/ })
