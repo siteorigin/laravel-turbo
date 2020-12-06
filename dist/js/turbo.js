@@ -117,9 +117,38 @@ Copyright © 2018 Basecamp, LLC
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_prefetch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/prefetch */ "./resources/js/utils/prefetch.js");
 /* harmony import */ var _utils_prefetch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_utils_prefetch__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_analytics__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/analytics */ "./resources/js/utils/analytics.js");
+/* harmony import */ var _utils_analytics__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_utils_analytics__WEBPACK_IMPORTED_MODULE_1__);
+
 
 
 __webpack_require__(/*! turbolinks */ "./node_modules/turbolinks/dist/turbolinks.js").start();
+
+/***/ }),
+
+/***/ "./resources/js/utils/analytics.js":
+/*!*****************************************!*\
+  !*** ./resources/js/utils/analytics.js ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+if (typeof gtag === 'function') {
+  var gaTrackingId = null;
+  document.addEventListener('turbolinks:load', function (event) {
+    if (gaTrackingId == null) {
+      // Lets store the Tracking ID
+      gaTrackingId = window.dataLayer[1][1]; // Assume standard tracking code has pushed the initial pageview
+
+      return;
+    } else {
+      // Register the pageview.
+      gtag('config', gaTrackingId, {
+        page_location: event.data.url
+      });
+    }
+  });
+}
 
 /***/ }),
 
