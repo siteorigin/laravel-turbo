@@ -161,8 +161,13 @@ if (typeof gtag === 'function') {
 
 var hoverTime = 100;
 var fetchers = {};
+/**
+ * @param url The URL to fetch
+ * @param success The success callback
+ * @returns {XMLHttpRequest}
+ */
 
-function fetchPage(url, success) {
+function fetchUrl(url, success) {
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url);
   xhr.setRequestHeader('VND.PREFETCH', 'true');
@@ -175,10 +180,17 @@ function fetchPage(url, success) {
   };
 
   xhr.send();
+  return xhr;
 }
+/**
+ * Prefetch a url, then store it in the Turbolinks cache.
+ * @param url
+ * @returns {XMLHttpRequest}
+ */
+
 
 function prefetchTurbolink(url) {
-  fetchPage(url, function (responseText) {
+  return fetchUrl(url, function (responseText) {
     var doc = document.implementation.createHTMLDocument('prefetch');
     doc.open();
     doc.write(responseText);
@@ -187,34 +199,55 @@ function prefetchTurbolink(url) {
     Turbolinks.controller.cache.put(url, snapshot);
   });
 }
+/**
+ * Prefetch a URL if it hasn't already been prefetched
+ * @param url
+ * @returns {XMLHttpRequest|boolean}
+ */
 
-function prefetch(url) {
-  if (prefetched(url)) return;
-  prefetchTurbolink(url);
+
+function prefetchUrl(url) {
+  if (hasPrefetched(url)) return true;
+  return prefetchTurbolink(url);
 }
+/**
+ * Has the given URL already been prefetched.
+ * @param url
+ * @returns {boolean}
+ */
 
-function prefetched(url) {
+
+function hasPrefetched(url) {
   return location.href === url || Turbolinks.controller.cache.has(url);
 }
+/**
+ * Is the given URL currently being prefetched.
+ * @param url
+ * @returns {boolean}
+ */
 
-function prefetching(url) {
+
+function isPrefetching(url) {
+  console.log(!!fetchers[url]);
   return !!fetchers[url];
 }
 
-function cleanup(event) {
+function cancelPrefetching(event) {
   var element = event.target;
   clearTimeout(fetchers[element.href]);
-  element.removeEventListener('mouseleave', cleanup);
+  delete fetchers[element.href];
+  element.removeEventListener('mouseleave', cancelPrefetching);
 }
 
 document.addEventListener('mouseover', function (event) {
   if (event.target.tagName !== 'A') return false;
   var url = event.target.href;
-  if (prefetched(url) || prefetching(url)) return false;
-  cleanup(event);
-  event.target.addEventListener('mouseleave', cleanup);
+  if (hasPrefetched(url) || isPrefetching(url)) return false;
+  cancelPrefetching(event); // Debounce the link hover prefetch
+
+  event.target.addEventListener('mouseleave', cancelPrefetching);
   fetchers[url] = setTimeout(function () {
-    return prefetch(url);
+    return prefetchUrl(url);
   }, hoverTime);
 }); // Change the Turbolinks cache size
 
@@ -226,7 +259,10 @@ document.addEventListener('turbolinks:load', function (event) {
 document.addEventListener('turbolinks:load', function (event) {
   document.querySelectorAll('a[rel*="prefetch"]').forEach(function (el) {
     var url = el.getAttribute('href');
-    if (!prefetched(url) && !prefetching(url)) prefetch(url);
+
+    if (!hasPrefetched(url) && !isPrefetching(url)) {
+      fetchers[url] = prefetchUrl(url);
+    }
   });
 });
 
