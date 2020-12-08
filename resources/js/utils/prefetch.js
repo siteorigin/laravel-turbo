@@ -73,8 +73,14 @@ function cancelPrefetching(event) {
   element.removeEventListener('mouseleave', cancelPrefetching)
 }
 
+function isExternalURL(url) {
+  return new URL(url).host !== (location.host);
+}
+
 document.addEventListener('mouseover', event => {
-  if (event.target.tagName !== 'A') return false
+  // Skip non links or links to external URLs
+  if (event.target.tagName !== 'A' || isExternalURL(event.target.href)) return false
+
   const url = event.target.href
   if (hasPrefetched(url) || isPrefetching(url)) return false
   cancelPrefetching(event)
@@ -90,7 +96,7 @@ document.addEventListener('turbolinks:load', event => { Turbolinks.controller.ca
 document.addEventListener('turbolinks:load', (event) => {
   document.querySelectorAll('a[rel*="prefetch"]').forEach((el) => {
     const url = el.getAttribute('href');
-    if (!hasPrefetched(url) && !isPrefetching(url)) {
+    if (!isExternalURL(url) && !hasPrefetched(url) && !isPrefetching(url)) {
       fetchers[url] = prefetchUrl(url)
     }
   })

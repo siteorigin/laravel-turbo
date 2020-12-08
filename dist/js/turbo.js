@@ -239,8 +239,13 @@ function cancelPrefetching(event) {
   element.removeEventListener('mouseleave', cancelPrefetching);
 }
 
+function isExternalURL(url) {
+  return new URL(url).host !== location.host;
+}
+
 document.addEventListener('mouseover', function (event) {
-  if (event.target.tagName !== 'A') return false;
+  // Skip non links or links to external URLs
+  if (event.target.tagName !== 'A' || isExternalURL(event.target.href)) return false;
   var url = event.target.href;
   if (hasPrefetched(url) || isPrefetching(url)) return false;
   cancelPrefetching(event); // Debounce the link hover prefetch
@@ -260,7 +265,7 @@ document.addEventListener('turbolinks:load', function (event) {
   document.querySelectorAll('a[rel*="prefetch"]').forEach(function (el) {
     var url = el.getAttribute('href');
 
-    if (!hasPrefetched(url) && !isPrefetching(url)) {
+    if (!isExternalURL(url) && !hasPrefetched(url) && !isPrefetching(url)) {
       fetchers[url] = prefetchUrl(url);
     }
   });
