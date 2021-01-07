@@ -1,3 +1,4 @@
 {
-    "/dist/js/turbo.js": "/dist/js/turbo.js"
+    "/dist/js/turbo.js": "/dist/js/turbo.js",
+    "/dist/js/turbo.min.js": "/dist/js/turbo.min.js"
 }

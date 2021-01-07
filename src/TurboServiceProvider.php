@@ -24,9 +24,13 @@ class TurboServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../dist/js/turbo.js' => public_path('vendor/turbo/turbo.js'),
-        ]);
+            __DIR__.'/../dist/js/turbo.min.js' => public_path('vendor/turbo/turbo.min.js'),
+        ], 'public');
 
-        Blade::directive('turbo_script', fn() => '<script src="' . url('vendor/turbo/turbo.js') . '" defer></script>');
+        $this->publishes([
+            __DIR__.'/../dist/js/turbo.js' => resource_path('vendor/turbo/turbo.js'),
+        ], 'resources');
+
+        Blade::directive('turbo_script', fn() => '<script src="' . url('vendor/turbo/turbo.min.js') . '" defer></script>');
     }
 }

@@ -62,7 +62,6 @@ function hasPrefetched (url) {
  * @returns {boolean}
  */
 function isPrefetching (url) {
-  console.log(!!fetchers[url]);
   return !!fetchers[url]
 }
 
