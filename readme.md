@@ -31,6 +31,16 @@ Then add the following line to your `resources/js/app.js` file.
 require('../vendor/turbo/turbo')
 ```
 
-## Future Development
+## Prefetching from Google Anlytics Data
 
-At the moment, this package is just a simple wrapper. In the future, we'd like to add more intellegent prefetching based on Google Analytics data or general navigation behavoir.
+Google Analytics stores useful data about which page a user is likely to visit next, after viewing the current page. This package integrates with [Spatie's Analytics Package](https://github.com/spatie/laravel-analytics) to automatically add `rel="prefetch"` to the most likely next pages. Make sure you've properly configured the Laravel Analytics package, then add `analytics-prefetch` middleware to all routes you want to process.
+
+```
+Route::get('/', function () {
+    return view('welcome');
+})->name('home')->middleware('analytics-prefetch');
+```
+
+Alternatively, add `SiteOrigin\Turbo\Middleware\AddPrefetch` to your global middleware. In `app\Http\Kernel.php`, add `\SiteOrigin\Turbo\Middleware\AddPrefetch::class` to the `$middlewareGroups` variable, in the `web` section.
+
+Caching is hanled by the Google Ananlytics package.

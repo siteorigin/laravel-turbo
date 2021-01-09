@@ -3,7 +3,9 @@
 namespace SiteOrigin\Turbo;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use SiteOrigin\Turbo\Middleware\AddPrefetch;
 
 class TurboServiceProvider extends ServiceProvider
 {
@@ -32,5 +34,7 @@ class TurboServiceProvider extends ServiceProvider
         ], 'resources');
 
         Blade::directive('turbo_script', fn() => '<script src="' . url('vendor/turbo/turbo.min.js') . '" defer></script>');
+
+        Route::aliasMiddleware('analytics-prefetch', AddPrefetch::class);
     }
 }
